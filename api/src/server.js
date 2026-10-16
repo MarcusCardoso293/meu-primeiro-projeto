@@ -1,23 +1,25 @@
-const express = require('express');
-const cors = require('cors');
+const { Router } = require('express');
+const router = Router();
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+const db = require('../database/db');
 
-app.use(cors());
-app.use(express.json());
+/* const vagasMock = [
+    {id: 1, titulo: 'Dev Frontend React', empresa: 'TechSimulada', tipo: 'remoto'}
+];
 
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    projeto: 'DevJobs API',
-    timestamp: new Date().toISOString()
-  });
+router.get('/', (req, res) => {
+    res.json(vagasMock);
+}); */
+
+router.get('/', (req, res) => {
+    const vagas = db.prepare(`
+        SELECT v.*, e.nome AS empresa_nome
+        FROM vagas v
+        JOIN empresas e ON e.id = v.empresa_id
+        ORDER BY v.created_at DESC
+    `).all();
+
+    res.json(vagas);
 });
 
-app.listen(PORT, () => {
-  console.log(`DevJobs API rodando em http://localhost:${PORT}`);
-});
-
-const vagasRoutes = require('./routes/vagas.routes');
-app.use('/api/vagas', vagasRoutes);
+module.exports = router;
