@@ -15,7 +15,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     titulo TEXT NOT NULL,
     empresa_id INTEGER NOT NULL,
-    tipo TEXT CHECK(tipo in ('remoto', 'presencial', 'hibrido')) NOT NULL,
+    tipo TEXT CHECK(tipo IN ('remoto','presencial','hibrido')) NOT NULL,
     tecnologias TEXT NOT NULL,
     salario TEXT,
     cep TEXT,
