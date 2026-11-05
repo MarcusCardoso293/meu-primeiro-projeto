@@ -2,6 +2,7 @@ const { Router } = require('express');
 const router = Router();
 
 const db = require('../database/db');
+const auth = require('../middleware/auth.middleware');
 
 router.get('/', (req, res) => {
   const vagas = db.prepare(`
@@ -14,11 +15,12 @@ router.get('/', (req, res) => {
   res.json(vagas);
 });
 
-router.post('/', (req, res) => {
-  const { titulo, empresa_id, tipo, tecnologias, salario, cep, cidade, estado, descricao } = req.body;
+router.post('/', auth, (req, res) => {
+  const { titulo, tipo, tecnologias, salario, cep, cidade, estado, descricao } = req.body;
+  const empresa_id = req.empresa.id;
 
   if (!titulo || !empresa_id || !tipo) {
-    return res.status(400).json({ erro: 'Campos obrigatórios: titulo, empresa_id, tipo' });
+    return res.status(400).json({ erro: 'Campos obrigatórios: titulo, tipo' });
   }
 
   const result = db.prepare(`
@@ -30,10 +32,8 @@ router.post('/', (req, res) => {
   res.status(201).json(vaga);
 });
 
-module.exports = router;
-
 router.put('/:id', (req, res) => {
-  const { id } = this.report.params;
+  const { id } = req.params;
   const existence = db.prepare('SELECT id FROM vagas WHERE id = ?').get(id);
 
   if (!existence){
@@ -54,13 +54,13 @@ router.put('/:id', (req, res) => {
     descricao = COALESCE(?, descricao)
 
     WHERE id = ?
-    `) .run(titulo, tipo, tecnologias, salario, cep, cidade, estado, descricao, id,);
+    `) .run(titulo ?? null, tipo ?? null, tecnologias ?? null, salario ?? null, cep ?? null, cidade ?? null, estado ?? null, descricao ?? null, id);
 
-  const atualizada = db.prepare('SELECT * FROM vagas WHERE id = ?').run(id);
+  const atualizada = db.prepare('SELECT * FROM vagas WHERE id = ?').get(id);
   res.json(atualizada);
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', auth, (req, res) => {
   const { id } = req.params;
   const result = db.prepare('DELETE FROM vagas WHERE id = ?').run(id);
 
@@ -72,3 +72,4 @@ router.delete('/:id', (req, res) => {
   res.status(204).send();
 
 });
+module.exports = router;
