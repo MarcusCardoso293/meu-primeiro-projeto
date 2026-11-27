@@ -7,11 +7,6 @@ const router = Router();
 
 router.post('/login', (req, res) => {
   const { email, senha } = req.body;
-
-  if (!email || !senha) {
-    return res.status(400).json({ erro: 'Informe email e senha' });
-  }
-
   const empresa = db.prepare('SELECT * FROM empresas WHERE email = ?').get(email);
 
   if (!empresa || !bcrypt.compareSync(senha, empresa.senha_hash)) {

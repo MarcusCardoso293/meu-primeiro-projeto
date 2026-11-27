@@ -1,6 +1,6 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,10 +18,12 @@ app.get('/api/health', (req, res) => {
 });
 
 const vagasRoutes = require('./routes/vagas.routes');
-const authRoutes = require('./routes/auth.routes');
-const cepRoutes = require('./routes/cep.routes');
 app.use('/api/vagas', vagasRoutes);
+
+const authRoutes = require('./routes/auth.routes')
 app.use('/api/auth', authRoutes);
+
+const cepRoutes = require('./routes/cep.routes')
 app.use('/api/cep', cepRoutes);
 
 app.use((err, req, res, next) => {
